@@ -14,7 +14,7 @@ func New(session *mgo.Session, db, c string) *CRUD {
 	return &CRUD{session, db, c}
 }
 
-func (crud *CRUD) Add(v interface{}) error {
+func (crud *CRUD) Create(v interface{}) error {
 	session := crud.session.Copy()
 	defer session.Close()
 
