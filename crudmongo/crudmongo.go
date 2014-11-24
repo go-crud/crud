@@ -3,6 +3,7 @@ package crudmongo
 import (
 	"github.com/plimble/errs"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type CRUD struct {
@@ -37,11 +38,11 @@ func (crud *CRUD) Upsert(id, v interface{}) error {
 	return errs.Mgo(err)
 }
 
-func (crud *CRUD) Update(id, v interface{}) error {
+func (crud *CRUD) Update(id interface{}, v map[string]interface{}) error {
 	session := crud.session.Copy()
 	defer session.Close()
 
-	return errs.Mgo(session.DB(crud.db).C(crud.c).UpdateId(id, v))
+	return errs.Mgo(session.DB(crud.db).C(crud.c).UpdateId(id, bson.M{"$set": v}))
 }
 
 func (crud *CRUD) Exist(id interface{}) (bool, error) {
