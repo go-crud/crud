@@ -65,7 +65,56 @@ func TestReadUpdateKey(t *testing.T) {
 	assert.Contains(t, vals, []string{"a", "b"})
 	assert.Contains(t, vals, "foo")
 	assert.Contains(t, vals, 10.4)
+}
 
+func TestUpsert(t *testing.T) {
+	crud := getSetup()
+	now := time.Now()
+
+	v := testData{ID: 25, Name: "Xier", Time: now, Height: 1500, Weight: 25.55}
+	err := crud.Upsert("25", &v)
+	assert.NoError(t, err)
+
+	var tempData testData
+	err = crud.db.Get(&tempData, "SELECT * FROM testTable WHERE id=25")
+	assert.NoError(t, err)
+	assert.Equal(t, v, tempData)
+}
+
+func TestconvertUpsertData(t *testing.T) {
+	now := time.Now().UTC()
+
+	checkVals := map[string]interface{}{
+		"id":     24,
+		"name":   "Xier",
+		"time":   now,
+		"height": 1500,
+		"weight": 25.55,
+	}
+
+	v := &testData{ID: 24, Name: "Xier", Time: now, Height: 1500, Weight: 25.55}
+	vals := convertUpsertData(v)
+	assert.Equal(t, checkVals, vals)
+}
+
+func TestExist(t *testing.T) {
+	crud := getSetup()
+	now := time.Now()
+
+	v := testData{ID: 18, Name: "Xier", Time: now, Height: 1500, Weight: 25.55}
+	err := crud.Create(&v)
+	assert.NoError(t, err)
+
+	found, err := crud.Exist("18")
+	assert.NoError(t, err)
+	assert.True(t, found)
+}
+
+func TestExistNotFound(t *testing.T) {
+	crud := getSetup()
+	_, err := crud.Exist("19")
+	assert.Error(t, err)
+	assert.True(t, errs.IsNotFound(err))
 }
 
 func TestUpdate(t *testing.T) {
@@ -86,7 +135,7 @@ func TestUpdate(t *testing.T) {
 
 	v2 := testData{ID: 13, Name: "Wichit", Time: now, Height: 900, Weight: 44.44}
 	var tempData testData
-	err = crud.db.Get(&tempData, "SELECT * FROM testTable WHERE id=13;")
+	err = crud.db.Get(&tempData, "SELECT * FROM testTable WHERE id=13")
 	assert.NoError(t, err)
 	assert.Equal(t, v2, tempData)
 }
@@ -113,7 +162,7 @@ func TestCreate(t *testing.T) {
 	assert.NoError(t, err)
 
 	var tempData testData
-	err = crud.db.Get(&tempData, "SELECT * FROM testTable WHERE id=11;")
+	err = crud.db.Get(&tempData, "SELECT * FROM testTable WHERE id=11")
 	assert.NoError(t, err)
 	assert.Equal(t, v, tempData)
 }
@@ -131,7 +180,7 @@ func TestDelete(t *testing.T) {
 
 	var tempData testData
 
-	err = crud.db.Get(&tempData, "SELECT * FROM testTable WHERE id=12;")
+	err = crud.db.Get(&tempData, "SELECT * FROM testTable WHERE id=12")
 	err = errs.Sql(err)
 	assert.Error(t, err)
 	assert.True(t, errs.IsNotFound(err))
