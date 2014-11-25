@@ -67,7 +67,7 @@ func TestReadUpdateKey(t *testing.T) {
 	assert.Contains(t, vals, 10.4)
 }
 
-func TestUpsert(t *testing.T) {
+func TestUpsertCreate(t *testing.T) {
 	crud := getSetup()
 	now := time.Now()
 
@@ -79,6 +79,24 @@ func TestUpsert(t *testing.T) {
 	err = crud.db.Get(&tempData, "SELECT * FROM testTable WHERE id=25")
 	assert.NoError(t, err)
 	assert.Equal(t, v, tempData)
+}
+
+func TestUpsertUpdate(t *testing.T) {
+	crud := getSetup()
+	now := time.Now()
+
+	v := testData{ID: 26, Name: "Xier", Time: now, Height: 1500, Weight: 25.55}
+	err := crud.Create(&v)
+	assert.NoError(t, err)
+
+	v2 := testData{ID: 26, Name: "Zier", Time: now, Height: 200, Weight: 33.32}
+	err = crud.Upsert("26", &v2)
+	assert.NoError(t, err)
+
+	var tempData testData
+	err = crud.db.Get(&tempData, "SELECT * FROM testTable WHERE id=26")
+	assert.NoError(t, err)
+	assert.Equal(t, v2, tempData)
 }
 
 func TestconvertUpsertData(t *testing.T) {
