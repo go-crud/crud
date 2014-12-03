@@ -45,13 +45,6 @@ func (crud *CRUD) Update(id interface{}, v map[string]interface{}) error {
 	return errs.Mgo(session.DB(crud.db).C(crud.c).UpdateId(id, bson.M{"$set": v}))
 }
 
-func (crud *CRUD) GetByID(id interface{}, v interface{}) error {
-	session := crud.session.Copy()
-	defer session.Close()
-
-	return errs.Mgo(session.DB(crud.db).C(crud.c).FindId(id).One(v))
-}
-
 func (crud *CRUD) Exist(id interface{}) (bool, error) {
 	session := crud.session.Copy()
 	defer session.Close()

@@ -35,12 +35,12 @@ func TestCRUD(t *testing.T) {
 	var data2 *testData
 
 	//get none exist data
-	err = crud.Get("2", data2)
+	err = crud.GetByID("2", data2)
 	assert.True(crud.IsNotFound(err))
 	assert.Nil(data2)
 
 	//get exist data
-	err = crud.Get("1", &data2)
+	err = crud.GetByID("1", &data2)
 	assert.NoError(err)
 	assert.Equal(data2, data1)
 
@@ -59,7 +59,7 @@ func TestCRUD(t *testing.T) {
 	err = crud.Update("1", data2)
 	assert.NoError(err)
 	var data3 *testData
-	err = crud.Get("1", &data3)
+	err = crud.GetByID("1", &data3)
 	assert.NoError(err)
 	assert.Equal(data3, data2)
 
@@ -71,7 +71,7 @@ func TestCRUD(t *testing.T) {
 	err = crud.Delete("1")
 	assert.NoError(err)
 	var data4 *testData
-	err = crud.Get("1", &data4)
+	err = crud.GetByID("1", &data4)
 	assert.True(crud.IsNotFound(err))
 	assert.Nil(data4)
 
