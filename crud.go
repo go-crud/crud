@@ -1,9 +1,11 @@
 package crud
 
 type CRUD interface {
-	Create(v interface{}) error
-	Delete(id interface{}) error
-	Update(id interface{}, v map[string]interface{}) error
-	Upsert(id, v interface{}) error
-	Exist(id interface{}) (bool, error)
+	Insert(v interface{}) error
+	Delete(id string) error
+	Update(id string, v map[string]interface{}) error
+	UpdateAll(id string, v interface{}) error
+	Upsert(id string, v interface{}) error
+	Exist(id string) (bool, error)
+	Get(id string, v interface{}) error
 }

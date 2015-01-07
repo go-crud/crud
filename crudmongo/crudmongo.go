@@ -16,7 +16,7 @@ func New(session *mgo.Session, db, c string) *CRUD {
 	return &CRUD{session, db, c}
 }
 
-func (crud *CRUD) Create(v interface{}) error {
+func (crud *CRUD) Insert(v interface{}) error {
 	session := crud.session.Copy()
 	defer session.Close()
 
@@ -62,4 +62,11 @@ func (crud *CRUD) Exist(id interface{}) (bool, error) {
 	}
 
 	return true, err
+}
+
+func (crud *CRUD) Get(id string, v interface{}) error {
+	session := crud.session.Copy()
+	defer session.Close()
+
+	return errs.Mgo(session.DB(crud.db).C(crud.c).FindId(id).One(v))
 }
