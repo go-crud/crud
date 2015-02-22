@@ -1,7 +1,7 @@
 package crudmongo
 
 import (
-	"github.com/plimble/errs"
+	"github.com/plimble/utils/errors2"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -20,14 +20,14 @@ func (crud *CRUD) Insert(v interface{}) error {
 	session := crud.session.Copy()
 	defer session.Close()
 
-	return errs.Mgo(session.DB(crud.db).C(crud.c).Insert(v))
+	return errors2.Mgo(session.DB(crud.db).C(crud.c).Insert(v))
 }
 
 func (crud *CRUD) Delete(id interface{}) error {
 	session := crud.session.Copy()
 	defer session.Close()
 
-	return errs.Mgo(session.DB(crud.db).C(crud.c).RemoveId(id))
+	return errors2.Mgo(session.DB(crud.db).C(crud.c).RemoveId(id))
 }
 
 func (crud *CRUD) Upsert(id, v interface{}) error {
@@ -35,21 +35,21 @@ func (crud *CRUD) Upsert(id, v interface{}) error {
 	defer session.Close()
 
 	_, err := session.DB(crud.db).C(crud.c).UpsertId(id, v)
-	return errs.Mgo(err)
+	return errors2.Mgo(err)
 }
 
 func (crud *CRUD) Update(id interface{}, v map[string]interface{}) error {
 	session := crud.session.Copy()
 	defer session.Close()
 
-	return errs.Mgo(session.DB(crud.db).C(crud.c).UpdateId(id, bson.M{"$set": v}))
+	return errors2.Mgo(session.DB(crud.db).C(crud.c).UpdateId(id, bson.M{"$set": v}))
 }
 
 func (crud *CRUD) UpdateAll(id interface{}, v interface{}) error {
 	session := crud.session.Copy()
 	defer session.Close()
 
-	return errs.Mgo(session.DB(crud.db).C(crud.c).UpdateId(id, v))
+	return errors2.Mgo(session.DB(crud.db).C(crud.c).UpdateId(id, v))
 }
 
 func (crud *CRUD) Exist(id interface{}) (bool, error) {
@@ -68,5 +68,5 @@ func (crud *CRUD) Get(id string, v interface{}) error {
 	session := crud.session.Copy()
 	defer session.Close()
 
-	return errs.Mgo(session.DB(crud.db).C(crud.c).FindId(id).One(v))
+	return errors2.Mgo(session.DB(crud.db).C(crud.c).FindId(id).One(v))
 }
