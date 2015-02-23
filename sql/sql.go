@@ -1,4 +1,4 @@
-package crudsql
+package sql
 
 import (
 	"fmt"

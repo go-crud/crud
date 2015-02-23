@@ -1,7 +1,8 @@
-package crudmongo
+package mongo
 
 import (
-	"github.com/plimble/errs"
+	"github.com/plimble/utils/errors2"
+
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/mgo.v2"
 	"testing"
@@ -15,7 +16,7 @@ type testData struct {
 func TestCRUD(t *testing.T) {
 	assert := assert.New(t)
 
-	session, err := mgo.Dial("127.0.0.1:27017")
+	session, err := mgo.Dial("192.168.59.103:27017")
 	assert.NoError(err)
 
 	db := "mongocrud"
@@ -31,17 +32,17 @@ func TestCRUD(t *testing.T) {
 
 	//add duplicate data
 	err = crud.Insert(data1)
-	assert.True(mgo.IsDup(err))
+	assert.Error(err)
 
 	var data2 *testData
 
 	//get none exist data
-	err = crud.Get("2", data2)
-	assert.True(errs.IsNotFound(err))
+	err = session.DB(db).C(c).FindId("2").One(&data2)
+	assert.True(errors2.IsNotFound(errors2.Mgo(err)))
 	assert.Nil(data2)
 
 	//get exist data
-	err = crud.Get("1", &data2)
+	err = session.DB(db).C(c).FindId("1").One(&data2)
 	assert.NoError(err)
 	assert.Equal(data2, data1)
 
@@ -60,23 +61,23 @@ func TestCRUD(t *testing.T) {
 	err = crud.UpdateAll("1", data2)
 	assert.NoError(err)
 	var data3 *testData
-	err = crud.Get("1", &data3)
+	err = session.DB(db).C(c).FindId("1").One(&data3)
 	assert.NoError(err)
 	assert.Equal(data3, data2)
 
 	//update none exist data
 	err = crud.UpdateAll("2", data2)
-	assert.True(errs.IsNotFound(err))
+	assert.True(errors2.IsNotFound(err))
 
 	//delete exist data
 	err = crud.Delete("1")
 	assert.NoError(err)
 	var data4 *testData
-	err = crud.Get("1", &data4)
-	assert.True(errs.IsNotFound(err))
+	err = session.DB(db).C(c).FindId("1").One(&data4)
+	assert.True(errors2.IsNotFound(errors2.Mgo(err)))
 	assert.Nil(data4)
 
 	//delete none exist data
 	err = crud.Delete("2")
-	assert.True(errs.IsNotFound(err))
+	assert.True(errors2.IsNotFound(err))
 }

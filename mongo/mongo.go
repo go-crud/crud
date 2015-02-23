@@ -1,4 +1,4 @@
-package crudmongo
+package mongo
 
 import (
 	"github.com/plimble/utils/errors2"
@@ -62,11 +62,4 @@ func (crud *CRUD) Exist(id interface{}) (bool, error) {
 	}
 
 	return true, err
-}
-
-func (crud *CRUD) Get(id string, v interface{}) error {
-	session := crud.session.Copy()
-	defer session.Close()
-
-	return errors2.Mgo(session.DB(crud.db).C(crud.c).FindId(id).One(v))
 }

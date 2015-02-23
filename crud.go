@@ -7,5 +7,4 @@ type CRUD interface {
 	UpdateAll(id string, v interface{}) error
 	Upsert(id string, v interface{}) error
 	Exist(id string) (bool, error)
-	Get(id string, v interface{}) error
 }
