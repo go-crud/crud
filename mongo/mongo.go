@@ -25,8 +25,8 @@ func (crud *CRUD) Insert(v interface{}) (error) {
     id:=bson.NewObjectId()// bid,_:=id.MarshalJSON()
     if value.Type().Kind() == reflect.Map {
         m := v.(map[string]interface{})
-        if len(m["Id"].(string))<1 {
-            m["Id"]=id
+        if len(m["_id"].(string))<1 {
+            m["_id"]=id
         }
     }else{
       s := value.Elem()

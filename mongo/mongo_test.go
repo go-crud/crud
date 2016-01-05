@@ -17,7 +17,7 @@ type testData struct {
     Age int `bson:"age"`
 }
 
-func testCRUD_JSON(t *testing.T) {
+func TestCRUD_JSON(t *testing.T) {
 	assert := assert.New(t)
 
 	session, dberr := mgo.Dial("192.168.1.178:27017")
@@ -30,7 +30,7 @@ func testCRUD_JSON(t *testing.T) {
     users:=session.DB(db).C(c)
 	users.RemoveAll(nil)
 
-    var jsonBlob = []byte(`{"Id":"","Name": "Alex"}`)
+    var jsonBlob = []byte(`{"_id":"","Name": "Alex"}`)
     var data map[string]interface{}
     err := json.Unmarshal(jsonBlob, &data)  
     assert.NoError(err)
@@ -41,8 +41,8 @@ func testCRUD_JSON(t *testing.T) {
 }
 func TestMap(t *testing.T) {
     args:=make(map[string]interface{})
-    args["Age"]=55
-    v,ok:=args["Age"]
+    args["age"]=55
+    v,ok:=args["age"]
     assert := assert.New(t)
     assert.Equal(v.(int), 55)
     assert.True(ok)
