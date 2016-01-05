@@ -7,6 +7,5 @@ type CRUD interface {
 	UpdateAll(id interface{}, v interface{}) error
 	Upsert(id interface{}, v interface{}) error
 	Exist(id interface{}) (bool, error)
-    // extend for MongoDB
-    //Update2(id interface{}, v map[string]interface{}) error
+   
 }

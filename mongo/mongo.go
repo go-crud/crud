@@ -22,15 +22,19 @@ func (crud *CRUD) Insert(v interface{}) (error) {
 	defer session.Close()
     value:=reflect.ValueOf(v)
    
-    id:=bson.NewObjectId()
+    id:=bson.NewObjectId()// bid,_:=id.MarshalJSON()
     if value.Type().Kind() == reflect.Map {
         m := v.(map[string]interface{})
-        m["Id"]=id
+        if len(m["Id"].(string))<1 {
+            m["Id"]=id
+        }
     }else{
       s := value.Elem()
-      // bid,_:=id.MarshalJSON()
       f := s.FieldByName("Id")
-      f.SetString(string(id))
+      oid := f.Interface()
+      if len(oid.(bson.ObjectId))<1{
+          f.SetString(string(id))
+      }
     }
   
     err:=errors2.Mgo(session.DB(crud.db).C(crud.c).Insert(v))

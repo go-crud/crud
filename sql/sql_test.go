@@ -40,7 +40,7 @@ func init() {
 }
 
 func getSetup() *CRUD {
-	return New(db, "testDB", "testTable")
+	return NewCRUD(db, "testDB", "testTable")
 }
 
 func TestReadDBTag(t *testing.T) {
