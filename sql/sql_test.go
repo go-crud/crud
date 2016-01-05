@@ -1,9 +1,10 @@
+
 package sql
 
 import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/plimble/errs"
+	errs "github.com/go-crud/errors2"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"

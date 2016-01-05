@@ -1,48 +1,72 @@
 package mongo
 
 import (
-	"github.com/plimble/utils/errors2"
-
+    "fmt"
+    "encoding/json"
+    "github.com/go-crud/errors2"
+    
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/mgo.v2"
+    "gopkg.in/mgo.v2/bson"
 	"testing"
 )
 
 type testData struct {
-	ID   string `bson:"_id"`
+	Id   bson.ObjectId `bson:"_id,omitempty"`
 	Name string `bson:"name"`
 }
 
+func TestCRUD_JSON(t *testing.T) {
+	assert := assert.New(t)
+
+	session, dberr := mgo.Dial("192.168.1.178:27017")
+	assert.NoError(dberr)
+    defer session.Close()
+
+	db := "test"
+	c := "users"
+	crud := NewCRUD(session, db, c)
+    users:=session.DB(db).C(c)
+	users.RemoveAll(nil)
+
+    var jsonBlob = []byte(`{"Id":"","Name": "Alex"}`)
+    var data map[string]interface{}
+  //  data=new map[string]interface{}{}
+    err := json.Unmarshal(jsonBlob, &data)  
+    assert.NoError(err)
+	err = crud.Insert(data)
+    assert.NoError(err)
+    fmt.Printf("%v\n",data);
+	assert.NoError(err)
+}
 func TestCRUD(t *testing.T) {
 	assert := assert.New(t)
 
-	session, err := mgo.Dial("192.168.59.103:27017")
+	session, dberr := mgo.Dial("192.168.1.178:27017")
+	assert.NoError(dberr)
+    defer session.Close()
+
+	db := "test"
+	c := "users"
+	crud := NewCRUD(session, db, c)
+    
+    users:=session.DB(db).C(c)
+
+	users.RemoveAll(nil)
+
+	data1 := &testData{Name: "Tom"}
+	err := crud.Insert(data1)
+    fmt.Printf("%v\n",data1);
 	assert.NoError(err)
-
-	db := "mongocrud"
-	c := "test"
-	crud := New(session, db, c)
-
-	session.DB(db).C(c).RemoveAll(nil)
-
-	//add data
-	data1 := &testData{"1", "name1"}
-	err = crud.Insert(data1)
-	assert.NoError(err)
-
-	//add duplicate data
-	err = crud.Insert(data1)
-	assert.Error(err)
 
 	var data2 *testData
-
 	//get none exist data
-	err = session.DB(db).C(c).FindId("2").One(&data2)
+	err = users.FindId("2").One(&data2)
 	assert.True(errors2.IsNotFound(errors2.Mgo(err)))
 	assert.Nil(data2)
 
 	//get exist data
-	err = session.DB(db).C(c).FindId("1").One(&data2)
+	err = users.FindId(data1.Id).One(&data2)
 	assert.NoError(err)
 	assert.Equal(data2, data1)
 
@@ -52,16 +76,16 @@ func TestCRUD(t *testing.T) {
 	assert.False(exist)
 
 	//check exist with data
-	exist, err = crud.Exist("1")
+	exist, err = crud.Exist(data1.Id)
 	assert.NoError(err)
 	assert.True(exist)
 
 	//update exist data
 	data2.Name = "name_updated"
-	err = crud.UpdateAll("1", data2)
+	err = crud.UpdateAll(data1.Id, data2)
 	assert.NoError(err)
 	var data3 *testData
-	err = session.DB(db).C(c).FindId("1").One(&data3)
+	err = users.FindId(data1.Id).One(&data3)
 	assert.NoError(err)
 	assert.Equal(data3, data2)
 
@@ -70,10 +94,10 @@ func TestCRUD(t *testing.T) {
 	assert.True(errors2.IsNotFound(err))
 
 	//delete exist data
-	err = crud.Delete("1")
+	err = crud.Delete(data1.Id)
 	assert.NoError(err)
 	var data4 *testData
-	err = session.DB(db).C(c).FindId("1").One(&data4)
+	err = users.FindId(data1.Id).One(&data4)
 	assert.True(errors2.IsNotFound(errors2.Mgo(err)))
 	assert.Nil(data4)
 

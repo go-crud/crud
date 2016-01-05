@@ -1,9 +1,10 @@
+
 package sql
 
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"github.com/plimble/errs"
+	errs "github.com/go-crud/errors2"
 	"reflect"
 	"strings"
 )
@@ -14,7 +15,7 @@ type CRUD struct {
 	tableName string
 }
 
-func New(db *sqlx.DB, dbName, tableName string) *CRUD {
+func NewCRUD(db *sqlx.DB, dbName, tableName string) *CRUD {
 	return &CRUD{db, dbName, tableName}
 }
 
