@@ -10,7 +10,7 @@ import (
 
 
 
-func TestTags(t *testing.T) {
+func testTags(t *testing.T) {
 	assert := assert.New(t)
 
 	session, dberr := mgo.Dial("192.168.1.178:27017")

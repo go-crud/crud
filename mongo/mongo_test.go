@@ -30,7 +30,7 @@ func TestCRUD_JSON(t *testing.T) {
     users:=session.DB(db).C(c)
 	users.RemoveAll(nil)
 
-    var jsonBlob = []byte(`{"_id":"","Name": "Alex"}`)
+    var jsonBlob = []byte(`{"_id":"","name": "Alex"}`)
     var data map[string]interface{}
     err := json.Unmarshal(jsonBlob, &data)  
     assert.NoError(err)

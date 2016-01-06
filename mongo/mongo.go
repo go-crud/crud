@@ -25,16 +25,32 @@ func (crud *CRUD) Insert(v interface{}) (error) {
     id:=bson.NewObjectId()// bid,_:=id.MarshalJSON()
     if value.Type().Kind() == reflect.Map {
         m := v.(map[string]interface{})
-        if len(m["_id"].(string))<1 {
-            m["_id"]=id
+        fv:=m["_id"]
+        switch fv.(type) {
+        case string:
+            if len(fv.(string))<1 {
+                 m["_id"]=string(id)
+            }
+        case bson.ObjectId:
+            if len(fv.(bson.ObjectId))<1 {
+                 m["_id"]=id
+            }    
         }
+           
     }else{
       s := value.Elem()
       f := s.FieldByName("Id")
-      oid := f.Interface()
-      if len(oid.(bson.ObjectId))<1{
-          f.SetString(string(id))
-      }
+      fv := f.Interface()
+       switch fv.(type) {
+         case string:
+            if len(fv.(string))<1 {
+                 f.SetString(string(id))
+            }
+        case bson.ObjectId:
+            if len(fv.(bson.ObjectId))<1 {
+                 f.SetString(string(id))
+            } 
+       }     
     }
   
     err:=errors2.Mgo(session.DB(crud.db).C(crud.c).Insert(v))
